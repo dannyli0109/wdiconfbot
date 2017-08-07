@@ -27,9 +27,6 @@ var bot = new builder.UniversalBot(connector, [
   // }
     // session.send("Welcome to wdi conf")
     // builder.Prompts.text(session, "What is your name?");
-  },
-  function (session, results) {
-    session.send(results.response)
   }
 
   // session.send("hi said: %s", session.message.text);
