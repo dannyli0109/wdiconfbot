@@ -19,6 +19,11 @@ var connector = new builder.ChatConnector({
 server.post('/api/messages', connector.listen());
 
 // Receive messages from the user and respond by echoing each message back (prefixed with 'You said:')
-var bot = new builder.UniversalBot(connector, function (session) {
-    session.send("hi said: %s", session.message.text);
-});
+var bot = new builder.UniversalBot(connector, [
+  function (session) {
+    session.send("Welcome to wdi conf")
+    builder.Prompts.text(session, "How many people are in your party?");
+  }
+
+    // session.send("hi said: %s", session.message.text);
+]);
