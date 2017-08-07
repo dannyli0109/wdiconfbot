@@ -21,10 +21,11 @@ server.post('/api/messages', connector.listen());
 // Receive messages from the user and respond by echoing each message back (prefixed with 'You said:')
 var bot = new builder.UniversalBot(connector, [
   function (session) {
-    session.send("user: " + session.message.user.name)
-  //   for (var a in session) {
-  //   session.send(a + ": " + session[a])
-  // }
+    // debugger
+    // session.send("user: " + session.message.user)
+    for (var a in session.message.user) {
+    session.send(a + ": " + session.message.user[a])
+  }
     // session.send("Welcome to wdi conf")
     // builder.Prompts.text(session, "What is your name?");
   }
