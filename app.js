@@ -109,17 +109,32 @@ bot.dialog('helloDialog', [
   },
   function (session, results) {
     request({
-      uri: "http://localhost:3000/api/users",
+      uri: "https://secure-everglades-33652.herokuapp.com/api/users",
       qs: {
         name: results.response
       }
     }, function(error, res, body) {
         var user = JSON.parse(body)
-        session.userData.name = user.name
-        session.userData.id = user.id
-        session.send("Hello, " + session.userData.name + "! Welcome to wdi conf 2017 voting system." + "Id: " + session.userData.id);
-        session.send("How can I help you today?");
+        if (user != null) {
+          session.userData.name = user.name
+          session.userData.id = user.id
+          session.send("Hello, " + session.userData.name + "! Welcome to wdi conf 2017 voting system.");
+          builder.Prompts.choice(session, "What is your first choice?", topics);
 
+        } else {
+          session.send("Sorry we dont have " +results.response + " in our system!")
+          session.send("Bye")
+          session.endDialog()
+        }
     })
+  },
+  function (session, results) {
+    session.userData.first = results.response.entity
+    builder.Prompts.choice(session, "What is your second choice?", topics);
+  },
+  function (session, results) {
+    session.userData.second = results.response.entity
+    session.send("Got it... " + session.userData.name + " chose " + session.userData.first + " and " + session.userData.second);
+    session.endDialog()
   }
 ]).triggerAction({ matches: 'Hello' });
