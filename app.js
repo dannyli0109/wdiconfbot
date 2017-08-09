@@ -106,7 +106,7 @@ bot.dialog('helloDialog', [
           session.userData.id = user.id
 
           request({
-            uri: "http://localhost:3000/api/talks/all"
+            uri: "https://secure-everglades-33652.herokuapp.com/api/talks/all"
           }, function(error, res, body) {
             topics = JSON.parse(body).map(function(talk) {
               return talk.title
