@@ -104,25 +104,22 @@ bot.endConversationAction('goodbyeAction', "Ok... See you later.", { matches: 'G
 
 
 bot.dialog('helloDialog', [
-  function(session) {
-    builder.Prompts.text(session, 'Hi! What is your name?');
-  },
-  function (session, results) {
+  function (session) {
     request({
-      uri: "https://secure-everglades-33652.herokuapp.com/api/users",
+      uri: "https://secure-everglades-33652.herokuapp.com/api/users/u",
       qs: {
-        name: results.response
+        username: session.message.user.name
       }
     }, function(error, res, body) {
         var user = JSON.parse(body)
-        if (user != null) {
+        console.log(user);
+        if (body) {
           session.userData.name = user.name
           session.userData.id = user.id
           session.send("Hello, " + session.userData.name + "! Welcome to wdi conf 2017 voting system.");
           builder.Prompts.choice(session, "What is your first choice?", topics);
-
         } else {
-          session.send("Sorry we dont have " +results.response + " in our system!")
+          session.send("Sorry you are not registered in our system.")
           session.send("Bye")
           session.endDialog()
         }
