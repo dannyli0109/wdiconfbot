@@ -13,19 +13,7 @@ var server = restify.createServer();
 //     { field: 'state', prompt: "What state are you in?" }
 // ];
 
-var topics = [
-  "Fintech for all",
-  "The Rise of Citizen Development",
-  "The Box Model or How I Learned to Love Again",
-  "Breaking from Loops - Functional Programming in JS",
-  "Twitch streamers & the new age of eSports",
-  "Exploring Continuous Integration with Travis.",
-  "Create pixelated version of an image using p5.js",
-  "Data Structure- Linked List",
-  "Promises in JavaScript",
-  "Machine Does A Learn",
-  "5 ways video games could be used to improve our lives"
-]
+var topics
 
 
 server.listen(process.env.port || process.env.PORT || 3978, function () {
@@ -116,8 +104,16 @@ bot.dialog('helloDialog', [
         if (body) {
           session.userData.name = user.name
           session.userData.id = user.id
-          session.send("Hello, " + session.userData.name + "! Welcome to wdi conf 2017 voting system.");
-          builder.Prompts.choice(session, "What is your first choice?", topics);
+
+          request({
+            uri: "http://localhost:3000/api/talks/all"
+          }, function(error, res, body) {
+            topics = JSON.parse(body).map(function(talk) {
+              return talk.title
+            })
+            session.send("Hello, " + session.userData.name + "! Welcome to wdi conf 2017 voting system.");
+            builder.Prompts.choice(session, "What is your first choice?", topics);
+          })
         } else {
           session.send("Sorry you are not registered in our system.")
           session.send("Bye")
@@ -135,3 +131,8 @@ bot.dialog('helloDialog', [
     session.endDialog()
   }
 ]).triggerAction({ matches: 'Hello' });
+
+
+function getUserName() {
+
+}
