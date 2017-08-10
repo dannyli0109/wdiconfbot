@@ -64,18 +64,30 @@ bot.recognizer({
     var intent = { score: 0.0 };
 
     if (context.message.text) {
-      if (context.message.text.toLowerCase().indexOf('hi') > -1 ||
-      context.message.text.toLowerCase().indexOf('hello') > -1 ||
-      context.message.text.toLowerCase().indexOf('hey') > -1) {
+      if (
+        context.message.text.toLowerCase().split(" ").includes("hi") ||
+        context.message.text.toLowerCase().split(" ").includes("hi") ||
+        context.message.text.toLowerCase().split(" ").includes("hey")
+      ) {
         intent = { score: 1.0, intent: 'Hello' };
       }
-
-      if (context.message.text.toLowerCase().indexOf('votes') > -1 ||
-      context.message.text.toLowerCase().indexOf('vote') > -1) {
+      if (
+        context.message.text.toLowerCase().split(" ").includes('votes') ||
+        context.message.text.toLowerCase().split(" ").includes('vote')
+      ) {
         intent = { score: 1.0, intent: 'Vote' };
       }
-      if (context.message.text.toLowerCase().indexOf('goodbye') > -1) {
+      if (
+        context.message.text.toLowerCase().split(" ").includes('goodbye') ||
+        context.message.text.toLowerCase().split(" ").includes('bye')
+      ) {
         intent = { score: 1.0, intent: 'Goodbye' };
+      }
+      if (
+        context.message.text.toLowerCase().split(" ").includes('warmup') ||
+        context.message.text.toLowerCase().split(" ").includes('warmups')
+      ) {
+        intent = { score: 1.0, intent: "Warmup"}
       }
     }
     done(null, intent);
@@ -88,6 +100,11 @@ bot.dialog('voteDialog', function (session) {
 }).triggerAction({ matches: 'Vote' });
 
 
+bot.dialog('warmupDialog', function (session) {
+  session.endDialog("Warmup detected!");
+}).triggerAction({ matches: 'Warmup' });
+
+
 // Add a global endConversation() action that is bound to the 'Goodbye' intent
 bot.endConversationAction('goodbyeAction', "Ok... See you later.", { matches: 'Goodbye' });
 
@@ -97,7 +114,8 @@ bot.dialog('helloDialog', [
     request({
       uri: "https://secure-everglades-33652.herokuapp.com/api/users/u",
       qs: {
-        username: session.message.user.name
+        // username: session.message.user.name
+        username: "dannyli0109"
       }
     }, function(error, res, body) {
       var user = JSON.parse(body)
