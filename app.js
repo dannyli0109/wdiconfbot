@@ -33,9 +33,9 @@ server.post('/api/messages', connector.listen());
 var bot = new builder.UniversalBot(connector, [
 
 
-  function (session) {
-    session.send("Sorry i don't understand.")
-  }
+  // function (session) {
+  //   session.send("Sorry i don't understand.")
+  // }
   // function (session) {
   //   session.userData.name = session.message.user.name;
   //   session.send("Welcome to wdi conf voting system!")
@@ -70,7 +70,8 @@ bot.recognizer({
         intent = { score: 1.0, intent: 'Hello' };
       }
 
-      if (context.message.text.toLowerCase().indexOf('votes') > -1) {
+      if (context.message.text.toLowerCase().indexOf('votes') > -1 ||
+      context.message.text.toLowerCase().indexOf('vote') > -1) {
         intent = { score: 1.0, intent: 'Vote' };
       }
       if (context.message.text.toLowerCase().indexOf('goodbye') > -1) {
@@ -82,9 +83,9 @@ bot.recognizer({
 });
 
 // Add a help dialog with a trigger action that is bound to the 'Help' intent
-bot.dialog('helpDialog', function (session) {
-  session.endDialog("This bot will echo back anything you say. Say 'goodbye' to quit.");
-}).triggerAction({ matches: 'Help' });
+bot.dialog('voteDialog', function (session) {
+  session.endDialog("Voting is expire, visit https://secure-everglades-33652.herokuapp.com/api/votes/all to seed the tally");
+}).triggerAction({ matches: 'Vote' });
 
 
 // Add a global endConversation() action that is bound to the 'Goodbye' intent
@@ -111,8 +112,9 @@ bot.dialog('helloDialog', [
           topics = JSON.parse(body).map(function(talk) {
             return talk.title
           })
-          session.send("Hello, " + session.userData.name + "! Welcome to wdi conf 2017 voting system.");
-          builder.Prompts.choice(session, "What is your first choice?", topics);
+          session.send("Hello, " + session.userData.name + ", i'm a quiet bot");
+          session.endDialog()
+          // builder.Prompts.choice(session, "What is your first choice?", topics);
         })
       } else {
         session.send("Sorry you are not registered in our system.")
@@ -120,34 +122,34 @@ bot.dialog('helloDialog', [
         session.endDialog()
       }
     })
-  },
-  function (session, results) {
-    session.userData.first = results.response.entity
-    session.userData.firstIndex = results.response.index
-    builder.Prompts.choice(session, "What is your second choice?", topics);
-  },
-  function (session, results) {
-    session.userData.second = results.response.entity
-    session.userData.secondIndex = results.response.index
-
-
-
-    // Configure the request
-    var url = 'https://secure-everglades-33652.herokuapp.com/users/' + session.userData.id + "/votes"
-
-    // Start the request
-    request({
-      uri: url,
-      qs: {
-        first: session.userData.first,
-        second: session.userData.second
-      }
-    }, function (error, response, body) {
-      // Print out the response body
-      var message = JSON.parse(body).message;
-      session.send(message);
-      session.endDialog()
-    })
-
+    // },
+    // function (session, results) {
+    //   session.userData.first = results.response.entity
+    //   session.userData.firstIndex = results.response.index
+    //   builder.Prompts.choice(session, "What is your second choice?", topics);
+    // },
+    // function (session, results) {
+    //   session.userData.second = results.response.entity
+    //   session.userData.secondIndex = results.response.index
+    //
+    //
+    //
+    //   // Configure the request
+    //   var url = 'https://secure-everglades-33652.herokuapp.com/users/' + session.userData.id + "/votes"
+    //
+    //   // Start the request
+    //   request({
+    //     uri: url,
+    //     qs: {
+    //       first: session.userData.first,
+    //       second: session.userData.second
+    //     }
+    //   }, function (error, response, body) {
+    //     // Print out the response body
+    //     var message = JSON.parse(body).message;
+    //     session.send(message);
+    //     session.endDialog()
+    //   })
+    //
   }
 ]).triggerAction({ matches: 'Hello' });
