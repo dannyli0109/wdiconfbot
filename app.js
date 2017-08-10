@@ -66,7 +66,7 @@ bot.recognizer({
     if (context.message.text) {
       if (
         context.message.text.toLowerCase().split(" ").includes("hi") ||
-        context.message.text.toLowerCase().split(" ").includes("hi") ||
+        context.message.text.toLowerCase().split(" ").includes("hello") ||
         context.message.text.toLowerCase().split(" ").includes("hey")
       ) {
         intent = { score: 1.0, intent: 'Hello' };
