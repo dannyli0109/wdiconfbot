@@ -34,7 +34,7 @@ var bot = new builder.UniversalBot(connector, [
 
 
   function (session) {
-    session.send("Sorry i don't understand, but you can ask Kasun.")
+    session.send("Sorry i don't understand.")
   }
   // function (session) {
   //   session.userData.name = session.message.user.name;
@@ -70,8 +70,8 @@ bot.recognizer({
         intent = { score: 1.0, intent: 'Hello' };
       }
 
-      if (context.message.text.toLowerCase().indexOf('help') > -1) {
-        intent = { score: 1.0, intent: 'Help' };
+      if (context.message.text.toLowerCase().indexOf('votes') > -1) {
+        intent = { score: 1.0, intent: 'Vote' };
       }
       if (context.message.text.toLowerCase().indexOf('goodbye') > -1) {
         intent = { score: 1.0, intent: 'Goodbye' };
@@ -99,40 +99,55 @@ bot.dialog('helloDialog', [
         username: session.message.user.name
       }
     }, function(error, res, body) {
-        var user = JSON.parse(body)
-        console.log(user);
-        if (body) {
-          session.userData.name = user.name
-          session.userData.id = user.id
+      var user = JSON.parse(body)
+      console.log(user);
+      if (user != null) {
+        session.userData.name = user.name
+        session.userData.id = user.id
 
-          request({
-            uri: "https://secure-everglades-33652.herokuapp.com/api/talks/all"
-          }, function(error, res, body) {
-            topics = JSON.parse(body).map(function(talk) {
-              return talk.title
-            })
-            session.send("Hello, " + session.userData.name + "! Welcome to wdi conf 2017 voting system.");
-            builder.Prompts.choice(session, "What is your first choice?", topics);
+        request({
+          uri: "https://secure-everglades-33652.herokuapp.com/api/talks/all"
+        }, function(error, res, body) {
+          topics = JSON.parse(body).map(function(talk) {
+            return talk.title
           })
-        } else {
-          session.send("Sorry you are not registered in our system.")
-          session.send("Bye")
-          session.endDialog()
-        }
+          session.send("Hello, " + session.userData.name + "! Welcome to wdi conf 2017 voting system.");
+          builder.Prompts.choice(session, "What is your first choice?", topics);
+        })
+      } else {
+        session.send("Sorry you are not registered in our system.")
+        session.send("Bye")
+        session.endDialog()
+      }
     })
   },
   function (session, results) {
     session.userData.first = results.response.entity
+    session.userData.firstIndex = results.response.index
     builder.Prompts.choice(session, "What is your second choice?", topics);
   },
   function (session, results) {
     session.userData.second = results.response.entity
-    session.send("Got it... " + session.userData.name + " chose " + session.userData.first + " and " + session.userData.second);
-    session.endDialog()
+    session.userData.secondIndex = results.response.index
+
+
+
+    // Configure the request
+    var url = 'https://secure-everglades-33652.herokuapp.com/users/' + session.userData.id + "/votes"
+
+    // Start the request
+    request({
+      uri: url,
+      qs: {
+        first: session.userData.first,
+        second: session.userData.second
+      }
+    }, function (error, response, body) {
+      // Print out the response body
+      var message = JSON.parse(body).message;
+      session.send(message);
+      session.endDialog()
+    })
+
   }
 ]).triggerAction({ matches: 'Hello' });
-
-
-function getUserName() {
-
-}
