@@ -114,8 +114,8 @@ bot.dialog('helloDialog', [
     request({
       uri: "https://secure-everglades-33652.herokuapp.com/api/users/u",
       qs: {
-        // username: session.message.user.name
-        username: "dannyli0109"
+        username: session.message.user.name
+        // username: "dannyli0109"
       }
     }, function(error, res, body) {
       var user = JSON.parse(body)
